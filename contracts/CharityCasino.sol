@@ -14,7 +14,6 @@ contract CharityCasino is Ownable, VRFConsumerBase {
     mapping(address => uint256) playerTotalAmountSpent;
     mapping(address => uint256) playerAllowanceUsd;
     mapping(address => address) tokenPriceFeedMapping;
-    uint256 bet_limit;
     uint256 bet_amount;
     uint256 SPINNING_THRESHOLD = 50; // Usd
     uint256 public fee;
@@ -49,7 +48,7 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         // update bet limit variable
     }
 
-    function PlayerAllowance(uint256 _amount, address _token)
+    function PlayerAllowancePerSpin(uint256 _amount, address _token)
         public
         returns (uint256 max_usd_amount, uint256 max_token_amount)
     {
@@ -84,7 +83,7 @@ contract CharityCasino is Ownable, VRFConsumerBase {
     // call on front end when slot machine starts, takes input in dollars.
     function makeBet(address _token, uint256 _amount) public payable {
         uint256 max_allowance = playerAllowanceUsd[msg.sender];
-
+        uint256 bet_limit = calculateBetLimit(_token);
         require(_amount > 0, "Your bet must be higher than 0");
         require(
             _amount < bet_limit,

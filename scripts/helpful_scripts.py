@@ -5,6 +5,8 @@ from brownie import (
     MockV3Aggregator,
     VRFCoordinatorMock,
     LinkToken,
+    MockERC20,
+    MockOracle,
     Contract,
     exceptions,
 )
@@ -15,7 +17,7 @@ FORKED_ENVIRONMENTS = ["mainnet-fork-dev", "mumbai"]
 LOCAL_BLOCKCHAIN_ENVIRONMENTS = ["development", "ganache-local"]
 
 DECIMALS = 8
-INITIAL_VALUE = 2 * (10 ** 11)
+INITIAL_VALUE = Web3.toWei(2000, "ether")
 
 
 def get_account(index=None, id=None):
@@ -32,6 +34,8 @@ def get_account(index=None, id=None):
 
 
 def deploy_mocks(decimals=DECIMALS, initial_value=INITIAL_VALUE):
+    print(f"The active network is {network.show_active()}")
+    print("Deploying Mocks...")
     account = get_account()
     mock_price_feed = MockV3Aggregator.deploy(
         decimals, initial_value, {"from": account}
@@ -40,11 +44,28 @@ def deploy_mocks(decimals=DECIMALS, initial_value=INITIAL_VALUE):
     VRFCoordinatorMock.deploy(link_token.address, {"from": account})
     print("Deployed")
 
+    print("Deploying Mock Oracle...")
+    mock_oracle = MockOracle.deploy(link_token.address, {"from": account})
+    print(f"Deployed to {mock_oracle.address}")
+    print("Mocks Deployed!")
+
+    print("Deploying Mock VRFCoordinator...")
+    mock_vrf_coordinator = VRFCoordinatorMock.deploy(
+        link_token.address, {"from": account}
+    )
+    print("Deploying Mock Price Feed...")
+    mock_price_feed = MockV3Aggregator.deploy(
+        decimals, initial_value, {"from": account}
+    )
+    print(f"Deployed to {mock_price_feed.address}")
+
 
 contract_to_mock = {
     "eth_usd_price_feed": MockV3Aggregator,
     "vrf_coordinator": VRFCoordinatorMock,
     "link_token": LinkToken,
+    "matic_usd_price_feed": MockV3Aggregator,
+    "matic_token": MockERC20,
 }
 
 
