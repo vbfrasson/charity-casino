@@ -25,6 +25,8 @@ contract CharityCasino is Ownable, VRFConsumerBase {
     event RequestRandomness(bytes32 requestId);
 
     constructor(
+        address _maticAddress,
+        address _maticPriceFeed,
         address _vrfCoordinator,
         address _link,
         uint256 _fee,
@@ -32,6 +34,8 @@ contract CharityCasino is Ownable, VRFConsumerBase {
     ) public VRFConsumerBase(_vrfCoordinator, _link) {
         fee = _fee;
         keyhash = _keyhash;
+        allowedTokens.push[_maticAddress];
+        tokenPriceFeedMapping[_maticAddress];
     }
 
     function calculateBetLimit(address _token) public view returns (uint256) {
@@ -49,7 +53,7 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         // Check to see if the token being approved is allowed
         require(
             tokenIsAllowed(_token),
-            "This token is not supported, please use either XXX or XX to place your bets!"
+            "This token is not supported, please use MATIC to place your bets!"
         );
 
         playerAllowanceUsd[msg.sender] = _amount; // DISPLAY playerAllowanceUsd ON FRONTEND
@@ -188,9 +192,21 @@ contract CharityCasino is Ownable, VRFConsumerBase {
 
     function tokenIsAllowed(address _token) public returns (bool) {
         // how to loop trough mappings/arrays efficiently without excessive gas cost??
+        for (
+            uint256 allowedTokensIndex = 0;
+            allowedTokensIndex < allowedTokens.length;
+            allowedTokensIndex++
+        ) {
+            if (allowedTokens[allowedTokensIndex] == _token) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    function addAllowedTokens(address _token) public onlyOwner {}
+    function addAllowedTokens(address _token) public onlyOwner {
+        allowedTokens.push(_token);
+    }
 
     function fulfillRandomness(bytes32 _requestId, uint256 _randomness)
         internal
