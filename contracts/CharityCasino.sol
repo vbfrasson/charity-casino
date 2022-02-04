@@ -23,6 +23,7 @@ contract CharityCasino is Ownable, VRFConsumerBase {
     bool wheel_approval = false;
     bool playerWins = false;
     address[] public allowedTokens;
+    address prizePool;
     event RequestRandomness(bytes32 requestId);
 
     constructor(
@@ -36,7 +37,8 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         fee = _fee;
         keyhash = _keyhash;
         allowedTokens.push(_maticAddress);
-        tokenPriceFeedMapping[_maticAddress];
+        tokenPriceFeedMapping[_maticAddress] = _maticPriceFeed;
+        prizePool = payable(address(this));
     }
 
     function calculateBetLimit(address _token) public view returns (uint256) {
@@ -47,7 +49,7 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         // update bet limit variable
     }
 
-    function updatePlayerAllowance(uint256 _amount, address _token)
+    function PlayerAllowance(uint256 _amount, address _token)
         public
         returns (uint256 max_usd_amount, uint256 max_token_amount)
     {
@@ -79,6 +81,7 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         return max_token_amount;
     }
 
+    // call on front end when slot machine starts, takes input in dollars.
     function makeBet(address _token, uint256 _amount) public payable {
         uint256 max_allowance = playerAllowanceUsd[msg.sender];
 
@@ -100,48 +103,34 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         if (playerTotalAmountSpent[msg.sender] == SPINNING_THRESHOLD) {
             wheel_approval = false;
         }
-
-        // (uint256 price, uint256 decimals) = getTokenValue(_token);
-
-        // // convert amount to token value
-        // uint256 token_amount = price;
     }
 
-    // function PayWinner(address _charityAddress, uint256 _amount)
-    //     public
-    //     onlyOwner
-    //     returns (address winner, uint256 reward)
-    // {
-    //     //Insert random number here??
-
-    //     // do something to calcualte win or lose
-    //     //change state of playerWins if necessary
-
-    //     // if player lost: donate()
-    //     if (playerWins == false) {
-    //         payPlayer(_amount);
-    //     }
-
-    //     // if player won: pay player()
-
-    //     // update bet limit
-    // }
-
     // if player lost:
+    // takes input in MATIC
     function donate(
         uint256 _amount,
         address _token,
-        address _charityAddress
-    ) private {
+        address _charityAddress,
+        address _playerAddress
+    ) public onlyOwner {
         // send player bet amount to charity -- maybe keep a portion to increase prize pool???
         // if testnet pay my account, if mainnet/polygon pay actual charity
+        require(
+            tokenIsAllowed(_token),
+            "This token is not supported, please donate using MATIC"
+        );
 
-        IERC20(_token).transferFrom(msg.sender, _charityAddress, _amount);
+        IERC20(_token).transferFrom(_playerAddress, _charityAddress, _amount);
     }
 
     // if player won:
-    function payPlayer(uint256 _amount) private {
+    function payPlayer(
+        address _token,
+        address _playerAddress,
+        uint256 _amount
+    ) public onlyOwner {
         calculatePlayerReward(_amount);
+        IERC20(_token).transfer(_playerAddress, _amount);
     }
 
     function calculatePlayerReward(uint256 _amount)
@@ -162,6 +151,7 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         wheel_approval == false;
     }
 
+    // Add button to front end for donations to the prize pool. Pass {msg.value} = to donation amount
     function IncreasePrizePool() public payable {
         //increases prize pool of given token. Serves as a donation portal for the casino itself.
     }
