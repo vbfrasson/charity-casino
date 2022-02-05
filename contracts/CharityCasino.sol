@@ -10,7 +10,6 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
      TO DISCUSS:
 
-        Should we implement more tokens?
 
         Spin the wheel =>
         Receive/Calculate Outcome --- possibly from another contract?
@@ -19,6 +18,11 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
         How to calculate player reward?
 
         How to calculate bet limit?
+
+        Integration with front end
+
+    
+    TODO:
 
     If player wins: 'calculatePlayerReward'
 
