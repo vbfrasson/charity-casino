@@ -9,8 +9,12 @@ compiler:
 dotenv: .env
 networks:
   development:
+    keyhash: "0x6e75b569a01ef56d18cab6a8e71e6600d6ce853834d4a5748b720d06f878b3a4"
+    fee: 100_000_000_000_000
     verify: False
   ganache-local:
+    keyhash: "0x6e75b569a01ef56d18cab6a8e71e6600d6ce853834d4a5748b720d06f878b3a4"
+    fee: 100_000_000_000_000
     verify: False
   kovan:
     verify: True
@@ -25,6 +29,16 @@ networks:
     vrf_coordinator: "0x8C7382F9D8f56b33781fE506E897a4F1e2d17255"
     keyhash: "0x6e75b569a01ef56d18cab6a8e71e6600d6ce853834d4a5748b720d06f878b3a4"
     fee: 100_000_000_000_000
+  rinkeby:
+    vrf_coordinator: "0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B"
+    eth_usd_price_feed: "0x8A753747A1Fa494EC906cE90E9f37563A8AF630e"
+    matic_usd_price_feed: "0x7794ee502922e2b723432DDD852B3C30A911F021"
+    matic_token: "0x1343a33d5510e95b87166433bcddd5dbee8b4d8a"
+    link_token: "0x01BE23585060835E02B77ef475b0Cc51aA1e0709"
+
+    keyhash: "0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311"
+    fee: 100_000_000_000_000_000
+    verify: True
 
 wallets:
   from_key: ${PRIVATE_KEY}

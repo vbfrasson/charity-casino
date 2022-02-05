@@ -13,7 +13,7 @@ from brownie import (
 import pytest
 from web3 import Web3
 
-FORKED_ENVIRONMENTS = ["mainnet-fork-dev", "mumbai"]
+FORKED_ENVIRONMENTS = ["polygon-test"]
 LOCAL_BLOCKCHAIN_ENVIRONMENTS = ["development", "ganache-local"]
 
 DECIMALS = 8
@@ -23,13 +23,11 @@ INITIAL_VALUE = Web3.toWei(2000, "ether")
 def get_account(index=None, id=None):
     if index:
         return accounts[index]
+
+    if network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        return accounts[0]
     if id:
         return accounts.load(id)
-    if (
-        network.show_active() in FORKED_ENVIRONMENTS
-        or network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS
-    ):
-        return accounts[0]
     return accounts.add(config["wallets"]["from_key"])
 
 
@@ -43,6 +41,8 @@ def deploy_mocks(decimals=DECIMALS, initial_value=INITIAL_VALUE):
     link_token = LinkToken.deploy({"from": account})
     VRFCoordinatorMock.deploy(link_token.address, {"from": account})
     print("Deployed")
+
+    matic_token = MockERC20.deploy({"from": account})
 
     print("Deploying Mock Oracle...")
     mock_oracle = MockOracle.deploy(link_token.address, {"from": account})
@@ -102,6 +102,20 @@ def fund_with_link(
     account = account if account else get_account()
     link_token = link_token if link_token else get_contract("link_token")
     funding_tx = link_token.transfer(contract_address, amount, {"from": account})
+    funding_tx.wait(1)
+    print("Contract Funded", contract_address)
+    return funding_tx
+
+
+def fund_with_matic(
+    contract_address,
+    account=None,
+    matic_token=None,
+    amount=1,
+):  # 0.01 MATIC
+    account = account if account else get_account()
+    matic_token = matic_token if matic_token else get_contract("matic_token")
+    funding_tx = matic_token.transfer(contract_address, amount, {"from": account})
     funding_tx.wait(1)
     print("Contract Funded", contract_address)
     return funding_tx

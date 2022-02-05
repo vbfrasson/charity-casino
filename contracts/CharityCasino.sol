@@ -6,23 +6,44 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
-// fund contract with link
-// Allowed token functions
+/*  
+
+     TO DISCUSS:
+
+        Should we implement more tokens?
+
+        Spin the wheel =>
+        Receive/Calculate Outcome --- possibly from another contract?
+        send NFT to player --- possibly from another contract?
+
+        How to calculate player reward?
+
+        How to calculate bet limit?
+
+    If player wins: 'calculatePlayerReward'
+
+    'calculateBetLimit' based on the amount of tokens we have to repay winning players.
+
+
+*/
 
 contract CharityCasino is Ownable, VRFConsumerBase {
-    // mapping(address => uint256) playerBetAmount;  is this necessary at all?
-    mapping(address => uint256) playerTotalAmountSpent;
-    mapping(address => uint256) playerAllowanceUsd;
-    mapping(address => address) tokenPriceFeedMapping;
+    mapping(address => uint256) public playerTotalAmountSpent;
+    mapping(address => uint256) public playerAllowanceUsd;
+    mapping(address => uint256) public playerAllowanceMtc;
+    mapping(address => address) public tokenPriceFeedMapping;
+    uint256 usd_allowance;
+    uint256 token_allowance;
     uint256 bet_amount;
-    uint256 SPINNING_THRESHOLD = 50; // Usd
+    uint256 public SPINNING_THRESHOLD = 50; // Usd
     uint256 public fee;
     uint256 public randomness;
     bytes32 public keyhash;
-    bool wheel_approval = false;
-    bool playerWins = false;
+    bool public wheel_approval = false;
+    bool public playerWins = false;
     address[] public allowedTokens;
-    address prizePool;
+    address public prizePool;
+    address public link;
     event RequestRandomness(bytes32 requestId);
 
     constructor(
@@ -38,6 +59,7 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         allowedTokens.push(_maticAddress);
         tokenPriceFeedMapping[_maticAddress] = _maticPriceFeed;
         prizePool = payable(address(this));
+        link = _link;
     }
 
     function calculateBetLimit(address _token) public view returns (uint256) {
@@ -46,11 +68,11 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         // calculate betlimit in tokens
         //calculate bet limit in dollars
         // update bet limit variable
+        return 100;
     }
 
-    function PlayerAllowancePerSpin(uint256 _amount, address _token)
+    function approvePlayerAllowancePerSpin(address _token, uint256 _amount)
         public
-        returns (uint256 max_usd_amount, uint256 max_token_amount)
     {
         // Check to see if the token being updated is allowed
         require(
@@ -58,29 +80,21 @@ contract CharityCasino is Ownable, VRFConsumerBase {
             "This token is not supported, please use MATIC to place your bets!"
         );
 
-        playerAllowanceUsd[msg.sender] = _amount; // DISPLAY playerAllowanceUsd ON FRONTEND
-        uint256 token_allowance = setAllowanceTokenAmount(_token);
-        return (_amount, token_allowance);
-    }
-
-    // DISPLAY MAX TOKEN AMOUNT NEXT TO MAX DOLAR AMOUNT front end
-    function setAllowanceTokenAmount(address _token)
-        public
-        returns (uint256 token_allowance)
-    {
         // get token value in dollars:
         (uint256 price, uint256 decimals) = getTokenValue(_token);
 
-        // set max token quantity based on dollar amount (playerAllowanceUsd[msg.sender])
-        uint256 max_token_amount = playerAllowanceUsd[msg.sender] /
-            (price / (10**decimals));
+        playerAllowanceUsd[msg.sender] = (_amount * price) / (10**decimals); // DISPLAY playerAllowanceUsd ON FRONTEND
+        usd_allowance = playerAllowanceUsd[msg.sender];
 
-        // call approve function and set it equal to max token amount;
-        IERC20(_token).approve(address(this), max_token_amount);
-        return max_token_amount;
+        //Update matic allowance mappping
+        playerAllowanceMtc[msg.sender] = _amount;
+        token_allowance = _amount;
+
+        // call approve function and set it equal to token_allowance;
+        IERC20(_token).approve(address(this), _amount);
     }
 
-    // call on front end when slot machine starts, takes input in dollars.
+    // call on front end when slot machine starts
     function makeBet(address _token, uint256 _amount) public payable {
         uint256 max_allowance = playerAllowanceUsd[msg.sender];
         uint256 bet_limit = calculateBetLimit(_token);
@@ -107,11 +121,11 @@ contract CharityCasino is Ownable, VRFConsumerBase {
     // if player lost:
     // takes input in MATIC
     function donate(
-        uint256 _amount,
         address _token,
+        address _playerAddress,
         address _charityAddress,
-        address _playerAddress
-    ) public onlyOwner {
+        uint256 _amount
+    ) public {
         // send player bet amount to charity -- maybe keep a portion to increase prize pool???
         // if testnet pay my account, if mainnet/polygon pay actual charity
         require(
@@ -128,13 +142,13 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         address _playerAddress,
         uint256 _amount
     ) public onlyOwner {
-        calculatePlayerReward(_amount);
-        IERC20(_token).transfer(_playerAddress, _amount);
+        uint256 player_reward = calculatePlayerReward(_amount);
+        // IERC20(_token).transfer(_playerAddress, player_reward);
     }
 
     function calculatePlayerReward(uint256 _amount)
-        private
-        view
+        public
+        onlyOwner
         returns (uint256 reward)
     {}
 
@@ -143,8 +157,8 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         bytes32 requestId = requestRandomness(keyhash, fee);
         emit RequestRandomness(requestId);
 
-        // Receive/Calculate Outcome
-        // send NFT to player --- possibly another function
+        // Receive/Calculate Outcome --- possibly from another contract
+        // send NFT to player --- possibly from another contract
 
         // reset approval to false
         wheel_approval == false;
@@ -202,22 +216,6 @@ contract CharityCasino is Ownable, VRFConsumerBase {
         require(_randomness > 0, "random number not found.");
         randomness = _randomness;
     }
+
+    receive() external payable {}
 }
-
-// player approves max bet amount only once with and that value is never changed after.
-//  only if player calls it. - DONE
-// player then bets based on that maximum amount. - DONE
-
-// Enable players to choose what cryptocurrency they want to use. ADD tokens
-// When players click deposit bet they also  - DONE
-// approve for us to transfer it to charity in case of loss. - DONE
-// get random number from polygon/chainlink -DONE
-
-// If player wins: calcualte how much he wins.
-
-// get priceFeed so users can see bet in dollars. -DONE
-
-// function where player chooses how to donate. *
-// Accept different ERC20s *
-
-//fund slot machine with test net money.

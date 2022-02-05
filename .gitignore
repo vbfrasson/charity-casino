@@ -6,3 +6,4 @@ build/
 reports/
 TODO.txt
 OBS.txt
+deploy_ignore.py
