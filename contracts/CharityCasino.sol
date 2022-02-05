@@ -19,7 +19,10 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
         How to calculate bet limit?
 
-        Integration with front end
+        Integration with front end:
+            Can the front end successfully approve through "approvePlayerAllowancePerSpin"
+            and call donate to make the transfer OR 
+            should the front end just call the ERC20 approve and transferFrom function??
 
     
     TODO:
