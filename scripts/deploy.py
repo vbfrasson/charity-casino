@@ -20,7 +20,7 @@ def deploy():
         config["networks"][network.show_active()]["fee"],
         config["networks"][network.show_active()]["keyhash"],
         {"from": account},
-        # publish_source=True,
+        publish_source=True,
     )
     bet = 10
     link_tx = fund_with_link(charity_casino.address)
@@ -49,3 +49,6 @@ def approve_erc20(_amount, _spender, _erc20_address, _account):
 
 def main():
     deploy()
+
+
+# verified address: 0x26ea80F2B670949B91616c89D1796e0f2fB8B679

@@ -1,0 +1,1 @@
+export { useCasinoContract } from "./useCasinoContract"

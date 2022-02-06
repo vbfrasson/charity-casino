@@ -3,6 +3,8 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
@@ -35,6 +37,7 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 */
 
 contract CharityCasino is Ownable, VRFConsumerBase {
+    mapping(address => uint256) public playerHowManyBets;
     mapping(address => uint256) public playerTotalAmountSpent;
     mapping(address => uint256) public playerAllowanceUsd;
     mapping(address => uint256) public playerAllowanceMtc;
@@ -122,6 +125,21 @@ contract CharityCasino is Ownable, VRFConsumerBase {
             _amount;
         if (playerTotalAmountSpent[msg.sender] == SPINNING_THRESHOLD) {
             wheel_approval = false;
+        }
+
+        //Randomnly give NFTs to players.
+        uint256 lucky_number = randomness % 101;
+
+        if (lucky_number < 21) {
+            //mint commom NFT
+            IERC721(_someAddress).safeTransferFrom(address _from, address _to, uint256 _tokenId);
+        }
+        if (lucky_number > 21 && lucky_number < 31) {
+            //mint uncommom NFT
+        }
+
+        if (lucky_number == 32) {
+            //mint legendary NFT
         }
     }
 

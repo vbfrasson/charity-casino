@@ -1,0 +1,303 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");
+
+html {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Space",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  background-color: hsl(227, 61%, 26%);
+  margin: 0;
+}
+
+body {
+  display: grid;
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    hsl(227, 61%, 13%),
+    hsl(227, 61%, 26%),
+    hsl(227, 61%, 39%)
+  );
+}
+
+body::backdrop {
+  background-color: hsl(227, 61%, 26%);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* body { 
+  background-color: #292929;
+} */
+
+#repeatButton {
+  appearance: none;
+  border: none;
+  background: url(https://andyhoffman.codes/random-assets/img/slots/repeat.png)
+    transparent 0 0 no-repeat;
+  background-size: cover;
+  width: 48px;
+  height: 48px;
+  /* position: absolute; */
+  top: 10px;
+  right: 20px;
+  cursor: pointer;
+  animation: 6s linear infinite spin;
+}
+
+h1 {
+  font-size: 150%;
+  padding: 0.25em 0.5em;
+  font-family: "Cairo", sans-serif;
+}
+
+h1 span {
+  color: aliceblue;
+  border: 1px solid hsla(208, 100%, 97.1%, 0.2);
+  padding: 0.1em 0.2em;
+}
+
+.icons {
+  display: inline-block;
+  width: 128px;
+  height: 564px;
+  overflow: hidden;
+  background: #fff
+    url(https://andyhoffman.codes/random-assets/img/slots/sprite5.png) repeat-y;
+  will-change: backgroundPosition;
+  transition: 0.3s background-position ease-in-out;
+  padding: 0 80px;
+  transform: translateZ(0);
+}
+
+.icons:nth-child(2) {
+  margin: 0 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.spinner-container {
+  overflow: hidden;
+  height: 632px;
+  padding: 2em;
+  transform: inherit;
+  position: inherit;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  transition: 0.3s transform;
+}
+.wheel-container {
+  overflow: hidden;
+  height: 632px;
+  padding: 2em;
+  transform: inherit;
+  position: inherit;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  transition: 0.3s transform;
+}
+
+.app-wrap.winner-false {
+  animation: linear 1s spin;
+}
+
+/* .spinner-container::after {
+  position: absolute;
+  content: '';
+  display: block;
+  height: 180px;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 30px;
+  left: 30px;
+  background: rgba(255, 0, 0, .1);  
+} */
+
+.gradient-fade {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  bottom: 32px;
+  left: 32px;
+  background: linear-gradient(
+    to bottom,
+    rgba(64, 64, 64, 1) 0%,
+    rgba(64, 64, 64, 0) 7%,
+    rgba(64, 64, 64, 0) 93%,
+    rgba(64, 64, 64, 1) 100%
+  );
+}
+
+@media screen and (max-width: 1000px) {
+  .spinner-container {
+    transform: translate(-50%, -50%) scale(0.55, 0.55);
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .spinner-container {
+    transform: translate(-50%, -50%) scale(0.4, 0.4);
+  }
+}
+
+#_1 {
+  fill: #ba4d4e;
+}
+
+#_2 {
+  fill: #fc7800;
+}
+
+#_3 {
+  fill: #14c187;
+}
+
+#_4 {
+  fill: #1592e8;
+}
+
+#_5 {
+  fill: #ba4d4e;
+}
+
+#_6 {
+  fill: #fc7800;
+}
+
+#_7 {
+  fill: #14c187;
+}
+
+#_8 {
+  fill: #1592e8;
+}
+
+#_9 {
+  fill: #ba4d4e;
+}
+
+#_10 {
+  fill: #fc7800;
+}
+
+#_11 {
+  fill: #14c187;
+}
+
+#_12 {
+  fill: #1592e8;
+}
+
+.frame,
+.sticks {
+  fill: #fff;
+}
+
+.winIndicator {
+  fill: #fff;
+}
+
+.wheelMiddle {
+  fill: #fff;
+}
+
+body {
+  text-align: center;
+  margin: auto;
+  background-color: #dcd80a;
+}
+
+.luckywheel {
+  margin: 40px auto;
+  width: 50%;
+  height: 50%;
+}
+
+.btn,
+.btn:visited {
+  font-weight: 800;
+  margin: 10px;
+  height: 40px;
+  width: 140px;
+  box-shadow: 4px 4px 20px 0 #cc4c45;
+  border-radius: 0;
+  border: 2px solid #000;
+  background-color: #fff;
+  color: #000;
+}
+
+.btn:hover,
+.btn:active {
+  color: #fff;
+  background-color: #000;
+  border: none;
+  text-decoration: none;
+  box-shadow: 4px 4px 5px 0 #cc4c45;
+}
+
+button {
+  background: none;
+  border: 1px solid black;
+  font-size: 30px;
+  border-radius: 5px;
+}
+
+#spin,
+#reset {
+  position: absolute;
+  bottom: 45vh;
+  right: 43vw;
+}
+
+#spin:hover {
+  color: rgb(255, 0, 0);
+  border-color: rgb(255, 3, 3);
+}
+
+#spin:focus,
+#reset:focus {
+  outline: none;
+}
+
+#reset:hover {
+  color: red;
+  border-color: red;
+}
+
+#readout {
+  position: absolute;
+  top: 105vh;
+  right: 40vw;
+}
+
+#selector {
+  position: absolute;
+  bottom: 36vh; /*13*/
+  right: 46vw; /*45*/
+  font-size: 40px;
+  color: rgb(0, 0, 0);
+  z-index: 3;
+}
+
+#result {
+  font-size: 50px;
+  color: rgb(0, 0, 0);
+}
